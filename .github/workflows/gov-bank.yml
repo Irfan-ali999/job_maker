@@ -1,8 +1,8 @@
-name: IT & Remote Job Monitor
+name: Government & Bank Job Monitor
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "30 2 * * *"
   workflow_dispatch:
 
 permissions:
@@ -31,7 +31,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python -m src.main --pipeline it-remote
+          python -m src.main --pipeline gov-bank
 
       - name: Persist seen database
         run: |
@@ -39,7 +39,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add data/seen.db
-            git commit -m "Update seen db (it-remote)"
+            git commit -m "Update seen db (gov-bank)"
             git push
           else
             echo "No DB changes to commit."
