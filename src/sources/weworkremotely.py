@@ -13,19 +13,32 @@ class WeWorkRemotelySource:
 
     def fetch(self) -> list[Job]:
         xml = fetch_html(self.url)
+
+        # Parse RSS safely
         soup = soup_from_html(xml)
         items = soup.find_all("item")
+
         jobs: list[Job] = []
 
         for item in items:
-            title = normalize_text(item.findtext("title", ""))
-            link = item.findtext("link", "")
-            if not link:
+            # Raw fields (can be None in real RSS feeds)
+            raw_title = item.findtext("title")
+            raw_link = item.findtext("link")
+            raw_date = item.findtext("pubDate")
+
+            # Skip malformed items safely
+            if not raw_title or not raw_link:
                 continue
+
+            # Normalize safely
+            title = normalize_text(str(raw_title))
+            link = str(raw_link)
+
             company = "WeWorkRemotely"
             location = "Remote"
-            posted = parse_date(item.findtext("pubDate", ""))
+            posted = parse_date(raw_date or "")
             job_id = hash_url(link)
+
             jobs.append(
                 Job(
                     id=job_id,
@@ -42,4 +55,5 @@ class WeWorkRemotelySource:
                     source=self.name,
                 )
             )
+
         return jobs
